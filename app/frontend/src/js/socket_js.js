@@ -140,10 +140,10 @@ async function fetchProfilePics(playerUsername, opponentUsername) {
             throw new Error('Failed to fetch profile picture');
         }
         const data = await response.json();
-        document.getElementById('player1-pic').src = data.player1Pic;
-        document.getElementById('player2-pic').src = data.player2Pic;
-        document.getElementById('player1-name').textContent = data.player1Name;
-        document.getElementById('player2-name').textContent = data.player2Name;
+        document.getElementById('player1-pic').src = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(data.player1Pic)))}`;
+        document.getElementById('player2-pic').src = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(data.player2Pic)))}`;
+        document.getElementById('player1-name').textContent = new TextDecoder().decode(new Uint8Array(data.player1Name));
+        document.getElementById('player2-name').textContent = new TextDecoder().decode(new Uint8Array(data.player2Name));
     } catch (error) {
         console.error('Error fetching profile pictures:', error);
     }

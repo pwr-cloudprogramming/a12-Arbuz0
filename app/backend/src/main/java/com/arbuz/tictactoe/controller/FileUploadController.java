@@ -2,9 +2,13 @@ package com.arbuz.tictactoe.controller;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.util.IOUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,16 +41,26 @@ public class FileUploadController {
     }
 
     @GetMapping("/get-profile-pic/{username}/{opponentUsername}")
-    public ResponseEntity<Map<String, String>> getProfilePic(@PathVariable String username, @PathVariable String opponentUsername) {
-        String player1PicUrl = amazonS3.getUrl(bucketName, username + "-profilepic.png").toString();
-        String player2PicUrl = amazonS3.getUrl(bucketName, opponentUsername + "-profilepic.png").toString();
+    public ResponseEntity<Map<String, byte[]>> getProfilePic(@PathVariable String username, @PathVariable String opponentUsername) {
+        Map<String, byte[]> response = new HashMap<>();
 
-        Map<String, String> response = new HashMap<>();
-        response.put("player1Pic", player1PicUrl);
-        response.put("player2Pic", player2PicUrl);
-        response.put("player1Name", username);
-        response.put("player2Name", opponentUsername);
+        try {
+            S3Object player1PicObject = amazonS3.getObject(bucketName, username + "-profilepic.png");
+            byte[] player1PicBytes = IOUtils.toByteArray(player1PicObject.getObjectContent());
 
-        return ResponseEntity.ok(response);
+            S3Object player2PicObject = amazonS3.getObject(bucketName, opponentUsername + "-profilepic.png");
+            byte[] player2PicBytes = IOUtils.toByteArray(player2PicObject.getObjectContent());
+
+            response.put("player1Pic", player1PicBytes);
+            response.put("player2Pic", player2PicBytes);
+            response.put("player1Name", username.getBytes());
+            response.put("player2Name", opponentUsername.getBytes());
+        } catch (IOException e) {
+            return ResponseEntity.status(500).body(null);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return ResponseEntity.ok().headers(headers).body(response);
     }
 }
