@@ -140,11 +140,25 @@ async function fetchProfilePics(playerUsername, opponentUsername) {
             throw new Error('Failed to fetch profile picture');
         }
         const data = await response.json();
-        document.getElementById('player1-pic').src = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(data.player1Pic)))}`;
-        document.getElementById('player2-pic').src = `data:image/png;base64,${btoa(String.fromCharCode(...new Uint8Array(data.player2Pic)))}`;
+        
+        const player1PicBase64 = arrayBufferToBase64(data.player1Pic);
+        const player2PicBase64 = arrayBufferToBase64(data.player2Pic);
+
+        document.getElementById('player1-pic').src = `data:image/png;base64,${player1PicBase64}`;
+        document.getElementById('player2-pic').src = `data:image/png;base64,${player2PicBase64}`;
         document.getElementById('player1-name').textContent = new TextDecoder().decode(new Uint8Array(data.player1Name));
         document.getElementById('player2-name').textContent = new TextDecoder().decode(new Uint8Array(data.player2Name));
     } catch (error) {
         console.error('Error fetching profile pictures:', error);
     }
+}
+
+function arrayBufferToBase64(buffer) {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return window.btoa(binary);
 }
