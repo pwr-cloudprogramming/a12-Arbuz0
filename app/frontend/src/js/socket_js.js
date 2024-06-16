@@ -158,7 +158,7 @@ async function fetchProfilePics(playerUsername, opponentUsername) {
 function addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name) {
     const footer = document.createElement('footer');
     footer.innerHTML = `
-        <div id="player-info" style="display: flex; justify-content: space-around; align-items: center; background-color: #333;">
+        <div id="player-info" style="display: flex; justify-content: space-around; align-items: center;">
             <div id="player1" style="text-align: center; color: white;">
                 <img id="player1-pic" src="data:image/png;base64,${player1PicBase64}" alt="${player1Name}" width="100" height="100">
                 <p id="player1-name">${player1Name}</p>
