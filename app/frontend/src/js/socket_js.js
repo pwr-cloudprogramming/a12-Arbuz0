@@ -140,14 +140,14 @@ async function fetchProfilePics(playerUsername, opponentUsername) {
             throw new Error('Failed to fetch profile picture');
         }
         const data = await response.json();
-        
+
         const player1PicBase64 = arrayBufferToBase64(data.player1Pic);
         const player2PicBase64 = arrayBufferToBase64(data.player2Pic);
 
-        document.getElementById('player1-pic').src = `data:image/png;base64,${player1PicBase64}`;
-        document.getElementById('player2-pic').src = `data:image/png;base64,${player2PicBase64}`;
-        document.getElementById('player1-name').textContent = new TextDecoder().decode(new Uint8Array(data.player1Name));
-        document.getElementById('player2-name').textContent = new TextDecoder().decode(new Uint8Array(data.player2Name));
+        const player1Name = new TextDecoder().decode(new Uint8Array(data.player1Name));
+        const player2Name = new TextDecoder().decode(new Uint8Array(data.player2Name));
+
+        addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name);
     } catch (error) {
         console.error('Error fetching profile pictures:', error);
     }
@@ -161,4 +161,21 @@ function arrayBufferToBase64(buffer) {
         binary += String.fromCharCode(bytes[i]);
     }
     return window.btoa(binary);
+}
+
+function addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name) {
+    const footer = document.createElement('footer');
+    footer.innerHTML = `
+        <div id="player-info">
+            <div id="player1">
+                <img id="player1-pic" src="data:image/png;base64,${player1PicBase64}" alt="${player1Name}" width="100" height="100">
+                <p id="player1-name">${player1Name}</p>
+            </div>
+            <div id="player2">
+                <img id="player2-pic" src="data:image/png;base64,${player2PicBase64}" alt="${player2Name}" width="100" height="100">
+                <p id="player2-name">${player2Name}</p>
+            </div>
+        </div>
+    `;
+    document.getElementById('game-interface').appendChild(footer);
 }
