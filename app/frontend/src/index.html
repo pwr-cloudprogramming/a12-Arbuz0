@@ -105,24 +105,19 @@
                 });
 
                 if (profilePic) {
-                    const fileName = `${username}-profilepic`;
+                    const formData = new FormData();
+                    formData.append('username', username);
+                    formData.append('profilePic', profilePic);
 
-                    const s3 = new AWS.S3();
-
-                    const params = {
-                        Bucket: S3_BUCKET_NAME,
-                        Key: fileName,
-                        Body: profilePic,
-                        ContentType: profilePic.type
-                    };
-
-                    s3.putObject(params, function(err, data) {
-                        if (err) {
-                            console.error('Error uploading data: ', err);
-                        } else {
-                            console.log('Successfully uploaded profile picture');
-                        }
+                    const response = await fetch('/upload-profile-pic', {
+                        method: 'POST',
+                        body: formData
                     });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to upload profile picture');
+                    }
+
                     alert('Profile picture uploaded successfully!');
                 }
 
