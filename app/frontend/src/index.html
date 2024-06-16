@@ -107,11 +107,11 @@
                 if (profilePic) {
                     const fileName = `${username}-profilepic`;
 
-                    AWS.config.credentials = new AWS.EC2MetadataCredentials({
-                        httpOptions: { timeout: 5000 }, // 5 seconds
-                        maxRetries: 10, // retry 10 times
-                        retryDelayOptions: { base: 200 } // 200 ms base delay
-                    });
+                    // AWS.config.credentials = new AWS.EC2MetadataCredentials({
+                    //     httpOptions: { timeout: 5000 }, // 5 seconds
+                    //     maxRetries: 10, // retry 10 times
+                    //     retryDelayOptions: { base: 200 } // 200 ms base delay
+                    // });
 
                     const s3 = new AWS.S3();
 
