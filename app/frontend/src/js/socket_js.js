@@ -9,12 +9,14 @@ function connectToSocket(gameId, opponentUsername) {
     const idToken = localStorage.getItem('idToken');
     const socket = new SockJS(`${url}/gameplay`);
     stompClient = Stomp.over(socket);
-    stompClient.connect({Authorization: `Bearer ${idToken}`}, function (frame) {
+    stompClient.connect({ Authorization: `Bearer ${idToken}` }, function (frame) {
         console.log("connected to the frame: " + frame);
         stompClient.subscribe("/topic/game-progress/" + gameId, function (response) {
             let data = JSON.parse(response.body);
             console.log(data);
-            displayResponse(data);
+            if (data.player2 && data.player2.login) {
+                fetchProfilePics(data.player1.login, data.player2.login);
+            }
         });
     }, function (error) {
         console.log('STOMP error: ' + error);
@@ -156,16 +158,20 @@ async function fetchProfilePics(playerUsername, opponentUsername) {
 function addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name) {
     const footer = document.createElement('footer');
     footer.innerHTML = `
-        <div id="player-info">
-            <div id="player1">
+        <div id="player-info" style="display: flex; justify-content: space-around; align-items: center; background-color: #333;">
+            <div id="player1" style="text-align: center; color: white;">
                 <img id="player1-pic" src="data:image/png;base64,${player1PicBase64}" alt="${player1Name}" width="100" height="100">
                 <p id="player1-name">${player1Name}</p>
             </div>
-            <div id="player2">
+            <div id="player2" style="text-align: center; color: white;">
                 <img id="player2-pic" src="data:image/png;base64,${player2PicBase64}" alt="${player2Name}" width="100" height="100">
                 <p id="player2-name">${player2Name}</p>
             </div>
         </div>
     `;
+    const existingFooter = document.querySelector('#game-interface footer');
+    if (existingFooter) {
+        existingFooter.remove();
+    }
     document.getElementById('game-interface').appendChild(footer);
 }
