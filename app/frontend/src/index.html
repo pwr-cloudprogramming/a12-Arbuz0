@@ -106,18 +106,27 @@
 
                 if (profilePic) {
                     const fileName = `${username}-profilepic`;
-                    const s3Client = new S3Client({
-                        region: COGNITO_REGION
+                    
+                    AWS.config.update({
+                    region: COGNITO_REGION // replace with your desired region
                     });
+                    
+                    const s3Client = new AWS.S3();
 
-                    const command = new PutObjectCommand({
+                    const params = {
                         Bucket: S3_BUCKET_NAME,
                         Key: fileName,
                         Body: profilePic,
                         ContentType: profilePic.type
-                    });
+                    };
 
-                    await s3Client.send(command);
+                    s3.putObject(params, function(err, data) {
+                        if (err) {
+                            console.error('Error uploading data: ', err);
+                        } else {
+                            console.log('Successfully uploaded data to test-bucket/hello-s3.txt');
+                        }
+                    });
                     alert('Profile picture uploaded successfully!');
                 }
 
