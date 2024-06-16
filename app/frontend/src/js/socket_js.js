@@ -141,26 +141,16 @@ async function fetchProfilePics(playerUsername, opponentUsername) {
         }
         const data = await response.json();
 
-        const player1PicBase64 = arrayBufferToBase64(data.player1Pic);
-        const player2PicBase64 = arrayBufferToBase64(data.player2Pic);
+        const player1PicBase64 = data.player1Pic;
+        const player2PicBase64 = data.player2Pic;
 
-        const player1Name = new TextDecoder().decode(new Uint8Array(data.player1Name));
-        const player2Name = new TextDecoder().decode(new Uint8Array(data.player2Name));
+        const player1Name = data.player1Name;
+        const player2Name = data.player2Name;
 
         addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name);
     } catch (error) {
         console.error('Error fetching profile pictures:', error);
     }
-}
-
-function arrayBufferToBase64(buffer) {
-    let binary = '';
-    const bytes = new Uint8Array(buffer);
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return window.btoa(binary);
 }
 
 function addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name) {

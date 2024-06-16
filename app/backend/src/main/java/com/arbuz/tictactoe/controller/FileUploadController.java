@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,8 +42,8 @@ public class FileUploadController {
     }
 
     @GetMapping("/get-profile-pic/{username}/{opponentUsername}")
-    public ResponseEntity<Map<String, byte[]>> getProfilePic(@PathVariable String username, @PathVariable String opponentUsername) {
-        Map<String, byte[]> response = new HashMap<>();
+    public ResponseEntity<Map<String, String>> getProfilePic(@PathVariable String username, @PathVariable String opponentUsername) {
+        Map<String, String> response = new HashMap<>();
 
         try {
             S3Object player1PicObject = amazonS3.getObject(bucketName, username + "-profilepic.png");
@@ -51,10 +52,13 @@ public class FileUploadController {
             S3Object player2PicObject = amazonS3.getObject(bucketName, opponentUsername + "-profilepic.png");
             byte[] player2PicBytes = IOUtils.toByteArray(player2PicObject.getObjectContent());
 
-            response.put("player1Pic", player1PicBytes);
-            response.put("player2Pic", player2PicBytes);
-            response.put("player1Name", username.getBytes());
-            response.put("player2Name", opponentUsername.getBytes());
+            String player1PicBase64 = Base64.getEncoder().encodeToString(player1PicBytes);
+            String player2PicBase64 = Base64.getEncoder().encodeToString(player2PicBytes);
+
+            response.put("player1Pic", player1PicBase64);
+            response.put("player2Pic", player2PicBase64);
+            response.put("player1Name", username);
+            response.put("player2Name", opponentUsername);
         } catch (IOException e) {
             return ResponseEntity.status(500).body(null);
         }
