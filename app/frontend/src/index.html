@@ -111,7 +111,7 @@
                     region: COGNITO_REGION // replace with your desired region
                     });
                     
-                    const s3Client = new AWS.S3();
+                    const s3 = new AWS.S3();
 
                     const params = {
                         Bucket: S3_BUCKET_NAME,
