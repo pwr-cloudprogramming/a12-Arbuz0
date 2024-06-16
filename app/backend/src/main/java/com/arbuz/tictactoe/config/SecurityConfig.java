@@ -49,7 +49,7 @@ public class SecurityConfig implements WebSocketMessageBrokerConfigurer {
                 .cors(Customizer.withDefaults()) // Enable CORS
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/public/**", "/gameplay/**").permitAll() // Allow access to WebSocket handshake endpoints
+                                .requestMatchers("/public/**", "/gameplay/**", "/api/**").permitAll() // Allow access to WebSocket handshake endpoints
                                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 ->
