@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -32,5 +34,19 @@ public class FileUploadController {
         } catch (IOException e) {
             return ResponseEntity.status(500).body("Failed to upload profile picture");
         }
+    }
+
+    @GetMapping("/get-profile-pic/{username}/{opponentUsername}")
+    public ResponseEntity<Map<String, String>> getProfilePic(@PathVariable String username, @PathVariable String opponentUsername) {
+        String player1PicUrl = amazonS3.getUrl(bucketName, username + "-profilepic.png").toString();
+        String player2PicUrl = amazonS3.getUrl(bucketName, opponentUsername + "-profilepic.png").toString();
+
+        Map<String, String> response = new HashMap<>();
+        response.put("player1Pic", player1PicUrl);
+        response.put("player2Pic", player2PicUrl);
+        response.put("player1Name", username);
+        response.put("player2Name", opponentUsername);
+
+        return ResponseEntity.ok(response);
     }
 }

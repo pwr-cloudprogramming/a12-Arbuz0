@@ -4,7 +4,7 @@ let stompClient;
 let gameId;
 let playerType;
 
-function connectToSocket(gameId) {
+function connectToSocket(gameId, opponentUsername) {
     console.log("connecting to the game");
     const idToken = localStorage.getItem('idToken');
     const socket = new SockJS(`${url}/gameplay`);
@@ -19,6 +19,8 @@ function connectToSocket(gameId) {
     }, function (error) {
         console.log('STOMP error: ' + error);
     });
+
+    fetchProfilePics(document.getElementById('player-username').textContent, opponentUsername);
 }
 
 function create_game() {
@@ -40,7 +42,7 @@ function create_game() {
                 gameId = data.gameId;
                 playerType = 'X';
                 reset();
-                connectToSocket(gameId);
+                connectToSocket(gameId, ""); // opponentUsername will be fetched after connection
                 alert("You created a game. Game id is: " + data.gameId);
                 gameOn = true;
             },
@@ -72,8 +74,9 @@ function connectToRandom() {
                 gameId = data.gameId;
                 playerType = 'O';
                 reset();
-                connectToSocket(gameId);
-                alert("Congrats you're playing with: " + data.player1.login);
+                const opponentUsername = data.player1.login;
+                connectToSocket(gameId, opponentUsername);
+                alert("Congrats you're playing with: " + opponentUsername);
             },
             error: function (error) {
                 console.log(error);
@@ -110,8 +113,9 @@ function connectToSpecificGame() {
                     gameId = data.gameId;
                     playerType = 'O';
                     reset();
-                    connectToSocket(gameId);
-                    alert("Congrats you're playing with: " + data.player1.login);
+                    const opponentUsername = data.player1.login;
+                    connectToSocket(gameId, opponentUsername);
+                    alert("Congrats you're playing with: " + opponentUsername);
                 },
                 error: function (error) {
                     console.log(error);
@@ -120,5 +124,27 @@ function connectToSpecificGame() {
         }).catch(err => {
             console.log(err);
         });
+    }
+}
+
+async function fetchProfilePics(playerUsername, opponentUsername) {
+    const idToken = localStorage.getItem('idToken');
+    const url = `${window.location.protocol}//${window.location.hostname}:8080/api/get-profile-pic/${playerUsername}/${opponentUsername}`;
+    try {
+        const response = await fetch(url, {
+            headers: {
+                'Authorization': 'Bearer ' + idToken
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch profile picture');
+        }
+        const data = await response.json();
+        document.getElementById('player1-pic').src = data.player1Pic;
+        document.getElementById('player2-pic').src = data.player2Pic;
+        document.getElementById('player1-name').textContent = data.player1Name;
+        document.getElementById('player2-name').textContent = data.player2Name;
+    } catch (error) {
+        console.error('Error fetching profile pictures:', error);
     }
 }

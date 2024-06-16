@@ -1,10 +1,8 @@
 <!doctype html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-        name="viewport">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" name="viewport">
     <meta content="ie=edge" http-equiv="X-UA-Compatible">
     <title>Document</title>
     <link crossorigin="anonymous" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
@@ -19,7 +17,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/aws-sdk/2.814.0/aws-sdk.min.js"></script> <!-- AWS SDK -->
     <script src="js/cognito-config.js"></script>
 </head>
-
 <body>
     <div class="text-center" id="box">
         <header>
@@ -73,6 +70,16 @@
             <div class="clearfix"></div>
             <footer>
                 <span>You are playing with <span id="oponentLogin"></span></span>
+                <div id="player-info">
+                    <div id="player1">
+                        <img id="player1-pic" src="" alt="Player 1" width="100" height="100">
+                        <p id="player1-name"></p>
+                    </div>
+                    <div id="player2">
+                        <img id="player2-pic" src="" alt="Player 2" width="100" height="100">
+                        <p id="player2-name"></p>
+                    </div>
+                </div>
             </footer>
         </div>
     </div>
@@ -163,6 +170,9 @@
                     document.getElementById('signin-form').style.display = 'none';
                     document.getElementById('signup-form').style.display = 'none';
                     document.getElementById('player-username').textContent = user.username;
+                    // Assuming opponent's username is known after sign in or fetched later
+                    const opponentUsername = "opponent"; // Placeholder for opponent's username
+                    fetchProfilePics(user.username, opponentUsername);
                 } catch (error) {
                     alert(error.message || error);
                 }
@@ -185,6 +195,9 @@
             if (idToken && validateToken(idToken)) {
                 aws_amplify.Auth.currentAuthenticatedUser().then(user => {
                     document.getElementById('player-username').textContent = user.username;
+                    // Assuming opponent's username is known after sign in or fetched later
+                    const opponentUsername = "opponent"; // Placeholder for opponent's username
+                    fetchProfilePics(user.username, opponentUsername);
                 });
                 document.getElementById('game-interface').style.display = 'block';
                 document.getElementById('signin-form').style.display = 'none';
@@ -220,5 +233,4 @@
     <script src="js/script.js"></script>
     <script src="js/socket_js.js"></script>
 </body>
-
 </html>
