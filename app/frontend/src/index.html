@@ -27,6 +27,8 @@
         <input id="signup-email" placeholder="Email">
         <input id="signup-username" placeholder="Username">
         <input id="signup-password" type="password" placeholder="Password">
+        <input type="file" id="signup-profilepic" accept="image/*"> <!-- Image upload input -->
+        <span id="file-name"></span> <!-- Span to display file name -->
         <button onclick="signUp()">Sign Up</button>
     </div>
 
@@ -77,6 +79,12 @@
                 region: COGNITO_REGION,
                 userPoolId: COGNITO_USER_POOL_ID,
                 userPoolWebClientId: COGNITO_CLIENT_ID,
+            },
+            Storage: {
+                AWSS3: {
+                    bucket: S3_BUCKET_NAME, // Reference the bucket name from cognito-config.js
+                    region: COGNITO_REGION,
+                }
             }
         });
 
@@ -84,6 +92,7 @@
             const email = document.getElementById('signup-email').value;
             const username = document.getElementById('signup-username').value;
             const password = document.getElementById('signup-password').value;
+            const profilePic = document.getElementById('signup-profilepic').files[0];
 
             try {
                 const { user } = await aws_amplify.Auth.signUp({
@@ -93,12 +102,21 @@
                         email: email,
                     }
                 });
+
+                if (profilePic) {
+                    const fileName = `${username}-profilepic`;
+                    await aws_amplify.Storage.put(fileName, profilePic, {
+                        contentType: profilePic.type
+                    });
+                    alert('Profile picture uploaded successfully!');
+                }
+
                 alert('Sign up successful! Please check your email for the verification code.');
                 document.getElementById('signup-form').style.display = 'none';
                 document.getElementById('verification-form').style.display = 'block';
                 document.getElementById('verification-username').value = username;
             } catch (error) {
-                alert(error.message);
+                alert(error.message || error);
             }
         }
 
@@ -112,7 +130,7 @@
                 document.getElementById('verification-form').style.display = 'none';
                 document.getElementById('signin-form').style.display = 'block';
             } catch (error) {
-                alert(error.message);
+                alert(error.message || error);
             }
         }
 
@@ -131,7 +149,7 @@
                 document.getElementById('signup-form').style.display = 'none';
                 document.getElementById('player-username').textContent = user.username;
             } catch (error) {
-                alert(error.message);
+                alert(error.message || error);
             }
         }
 
@@ -144,7 +162,7 @@
                 document.getElementById('signin-form').style.display = 'block';
                 document.getElementById('signup-form').style.display = 'block';
             } catch (error) {
-                alert(error.message);
+                alert(error.message || error);
             }
         }
 
@@ -172,6 +190,11 @@
                 return false;
             }
         }
+
+        document.getElementById('signup-profilepic').addEventListener('change', function(event) {
+            const fileName = event.target.files[0]?.name || 'No file selected';
+            document.getElementById('file-name').textContent = fileName;
+        });
 
         window.signUp = signUp;
         window.verify = verify;

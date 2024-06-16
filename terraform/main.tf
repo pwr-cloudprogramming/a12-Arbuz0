@@ -2,6 +2,13 @@ provider "aws" {
   region = "us-east-1"
 }
 
+resource "aws_s3_bucket" "ttt-bucket" {
+  bucket = "ttt-bucket-janiak"
+  tags   = {
+    Name = "ttt-bucket-janiak"
+  }
+}
+
 resource "aws_vpc" "l10_vpc" {
   cidr_block = "10.0.0.0/16"
   enable_dns_support   = true
@@ -144,7 +151,7 @@ resource "aws_instance" "l10_web_server" {
     cd /home/ubuntu
 
     # Clone repository
-    git clone https://github.com/pwr-cloudprogramming/a1-Arbuz0.git
+    git clone https://github.com/pwr-cloudprogramming/a12-Arbuz0.git
     cd a1-Arbuz0
 
     # Update cognito-config.js
@@ -152,6 +159,7 @@ resource "aws_instance" "l10_web_server" {
     const COGNITO_USER_POOL_ID = '${aws_cognito_user_pool.l10_user_pool.id}';
     const COGNITO_CLIENT_ID = '${aws_cognito_user_pool_client.l10_user_pool_client.id}';
     const COGNITO_REGION = 'us-east-1';
+    const S3_BUCKET_NAME = '${aws_s3_bucket.ttt-bucket.name}'
     EOT
 
     # Update application.properties
