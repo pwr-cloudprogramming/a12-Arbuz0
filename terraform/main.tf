@@ -137,6 +137,11 @@ resource "aws_cognito_user_pool_domain" "l10_user_pool_domain" {
   user_pool_id = aws_cognito_user_pool.l10_user_pool.id
 }
 
+resource "aws_iam_instance_profile" "l10_instance_profile" {
+  name = "LabRoleInstanceProfile"
+  role = "LabRole"
+}
+
 resource "aws_instance" "l10_web_server" {
   ami                         = "ami-080e1f13689e07408"
   instance_type               = "t2.micro"
@@ -144,10 +149,15 @@ resource "aws_instance" "l10_web_server" {
   subnet_id                   = aws_subnet.l10_subnet.id
   associate_public_ip_address = true
   vpc_security_group_ids      = [aws_security_group.allow_ssh_http.id]
+  iam_instance_profile        = aws_iam_instance_profile.l10_instance_profile.name
   user_data                   = <<-EOF
     #!/bin/bash
     apt update
     apt install -y docker docker-compose
+
+    echo "export AWS_SDK_LOAD_CONFIG=1" >> /home/ubuntu/.bashrc
+    source /home/ubuntu/.bashrc
+
     cd /home/ubuntu
 
     # Clone repository
@@ -160,7 +170,7 @@ resource "aws_instance" "l10_web_server" {
     const COGNITO_USER_POOL_ID = '${aws_cognito_user_pool.l10_user_pool.id}';
     const COGNITO_CLIENT_ID = '${aws_cognito_user_pool_client.l10_user_pool_client.id}';
     const COGNITO_REGION = 'us-east-1';
-    const S3_BUCKET_NAME = '${aws_s3_bucket.ttt-bucket.name}'
+    const S3_BUCKET_NAME = '${aws_s3_bucket.ttt-bucket.bucket}';
     EOT
 
     # Update application.properties
@@ -169,6 +179,8 @@ resource "aws_instance" "l10_web_server" {
     USER_POOL_CLIENT_ID=${aws_cognito_user_pool_client.l10_user_pool_client.id}
     USER_POOL_DOMAIN=${aws_cognito_user_pool_domain.l10_user_pool_domain.domain}.auth.us-east-1.amazoncognito.com
     aws.region=us-east-1
+    cloud.aws.region.static=us-east-1
+    cloud.aws.s3.bucket=${aws_s3_bucket.ttt-bucket.bucket}
     EOT
 
     # Start the Docker containers
@@ -179,6 +191,7 @@ resource "aws_instance" "l10_web_server" {
     Name = "l10-TicTacToe"
   }
 }
+
 
 output "app_url" {
   value = "http://${aws_instance.l10_web_server.public_ip}:8081"

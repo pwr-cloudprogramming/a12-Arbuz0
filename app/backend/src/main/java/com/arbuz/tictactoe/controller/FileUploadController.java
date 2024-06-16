@@ -12,7 +12,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@AllArgsConstructor
 @RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class FileUploadController {
@@ -25,7 +24,7 @@ public class FileUploadController {
 
     @PostMapping("/upload-profile-pic")
     public ResponseEntity<String> uploadProfilePic(@RequestParam("username") String username, @RequestParam("profilePic") MultipartFile profilePic) {
-        String fileName = username + "-profilepic";
+        String fileName = username + "-profilepic.png";
 
         try {
             amazonS3.putObject(new PutObjectRequest(bucketName, fileName, profilePic.getInputStream(), null));
