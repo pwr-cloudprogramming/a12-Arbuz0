@@ -109,7 +109,7 @@
                     formData.append('username', username);
                     formData.append('profilePic', profilePic);
 
-                    const response = await fetch('/upload-profile-pic', {
+                    const response = await fetch('/api/upload-profile-pic', {
                         method: 'POST',
                         body: formData
                     });
