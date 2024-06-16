@@ -152,7 +152,8 @@ resource "aws_instance" "l10_web_server" {
 
     # Clone repository
     git clone https://github.com/pwr-cloudprogramming/a12-Arbuz0.git
-    cd a1-Arbuz0
+    cd a12-Arbuz0
+    cd app
 
     # Update cognito-config.js
     cat <<EOT > /home/ubuntu/a1-Arbuz0/frontend/src/js/cognito-config.js
