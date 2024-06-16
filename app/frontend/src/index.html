@@ -106,11 +106,13 @@
 
                 if (profilePic) {
                     const fileName = `${username}-profilepic`;
-                    
-                    AWS.config.update({
-                    region: COGNITO_REGION // replace with your desired region
+
+                    AWS.config.credentials = new AWS.EC2MetadataCredentials({
+                        httpOptions: { timeout: 5000 }, // 5 seconds
+                        maxRetries: 10, // retry 10 times
+                        retryDelayOptions: { base: 200 } // 200 ms base delay
                     });
-                    
+
                     const s3 = new AWS.S3();
 
                     const params = {
@@ -124,7 +126,7 @@
                         if (err) {
                             console.error('Error uploading data: ', err);
                         } else {
-                            console.log('Successfully uploaded data to test-bucket/hello-s3.txt');
+                            console.log('Successfully uploaded profile picture');
                         }
                     });
                     alert('Profile picture uploaded successfully!');
