@@ -142,6 +142,21 @@ resource "aws_iam_instance_profile" "l10_instance_profile" {
   role = "LabRole"
 }
 
+resource "aws_dynamodb_table" "ttt_game_table" {
+  name         = "TicTacToeGame"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "GameId"
+
+  attribute {
+    name = "GameId"
+    type = "S"
+  }
+
+  tags = {
+    Name = "TicTacToeGame"
+  }
+}
+
 resource "aws_instance" "l10_web_server" {
   ami                         = "ami-080e1f13689e07408"
   instance_type               = "t2.micro"
@@ -181,6 +196,7 @@ resource "aws_instance" "l10_web_server" {
     aws.region=us-east-1
     cloud.aws.region.static=us-east-1
     cloud.aws.s3.bucket=${aws_s3_bucket.ttt-bucket.bucket}
+    dynamodb.table.name=${aws_dynamodb_table.ttt_game_table.name}
     EOT
 
     # Start the Docker containers
@@ -191,7 +207,6 @@ resource "aws_instance" "l10_web_server" {
     Name = "l10-TicTacToe"
   }
 }
-
 
 output "app_url" {
   value = "http://${aws_instance.l10_web_server.public_ip}:8081"
