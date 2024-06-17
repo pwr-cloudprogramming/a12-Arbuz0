@@ -1,5 +1,3 @@
-import { apiGatewayUrl, gameId } from './config.js';
-
 var turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
 var turn = "";
 var gameOn = false;
