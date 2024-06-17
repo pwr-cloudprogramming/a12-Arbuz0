@@ -290,60 +290,60 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.game_results_api.execution_arn}/*/*"
 }
 
-# # Define the OPTIONS method for CORS preflight
-# resource "aws_api_gateway_method" "options_method" {
-#   rest_api_id = aws_api_gateway_rest_api.game_results_api.id
-#   resource_id = aws_api_gateway_resource.results_resource.id
-#   http_method = "OPTIONS"
-#   authorization = "NONE"
-# }
+# Define the OPTIONS method for CORS preflight
+resource "aws_api_gateway_method" "options_method" {
+  rest_api_id = aws_api_gateway_rest_api.game_results_api.id
+  resource_id = aws_api_gateway_resource.results_resource.id
+  http_method = "OPTIONS"
+  authorization = "NONE"
+}
 
-# resource "aws_api_gateway_integration" "options_integration" {
-#   rest_api_id = aws_api_gateway_rest_api.game_results_api.id
-#   resource_id = aws_api_gateway_resource.results_resource.id
-#   http_method = aws_api_gateway_method.options_method.http_method
-#   type        = "MOCK"
+resource "aws_api_gateway_integration" "options_integration" {
+  rest_api_id = aws_api_gateway_rest_api.game_results_api.id
+  resource_id = aws_api_gateway_resource.results_resource.id
+  http_method = aws_api_gateway_method.options_method.http_method
+  type        = "MOCK"
 
-#   request_templates = {
-#     "application/json" = "{\"statusCode\": 200}"
-#   }
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
 
-#   integration_http_method = "OPTIONS"
-# }
+  integration_http_method = "OPTIONS"
+}
 
-# resource "aws_api_gateway_method_response" "options_response" {
-#   rest_api_id = aws_api_gateway_rest_api.game_results_api.id
-#   resource_id = aws_api_gateway_resource.results_resource.id
-#   http_method = aws_api_gateway_method.options_method.http_method
-#   status_code = "200"
+resource "aws_api_gateway_method_response" "options_response" {
+  rest_api_id = aws_api_gateway_rest_api.game_results_api.id
+  resource_id = aws_api_gateway_resource.results_resource.id
+  http_method = aws_api_gateway_method.options_method.http_method
+  status_code = "200"
 
-#   response_parameters = {
-#     "method.response.header.Access-Control-Allow-Headers" = true
-#     "method.response.header.Access-Control-Allow-Methods" = true
-#     "method.response.header.Access-Control-Allow-Origin"  = true
-#   }
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
 
-#   response_models = {
-#     "application/json" = "Empty"
-#   }
-# }
+  response_models = {
+    "application/json" = "Empty"
+  }
+}
 
-# resource "aws_api_gateway_integration_response" "options_integration_response" {
-#   rest_api_id = aws_api_gateway_rest_api.game_results_api.id
-#   resource_id = aws_api_gateway_resource.results_resource.id
-#   http_method = aws_api_gateway_method.options_method.http_method
-#   status_code = aws_api_gateway_method_response.options_response.status_code
+resource "aws_api_gateway_integration_response" "options_integration_response" {
+  rest_api_id = aws_api_gateway_rest_api.game_results_api.id
+  resource_id = aws_api_gateway_resource.results_resource.id
+  http_method = aws_api_gateway_method.options_method.http_method
+  status_code = aws_api_gateway_method_response.options_response.status_code
 
-#   response_parameters = {
-#     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
-#     "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
-#     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-#   }
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
 
-#   response_templates = {
-#     "application/json" = ""
-#   }
-# }
+  response_templates = {
+    "application/json" = ""
+  }
+}
 
 # Update the POST method response to include CORS headers
 resource "aws_api_gateway_method_response" "post_method_response" {
@@ -370,8 +370,8 @@ resource "aws_api_gateway_integration_response" "post_integration_response" {
   status_code = aws_api_gateway_method_response.post_method_response.status_code
 
   response_parameters = {
-    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'"
-    "method.response.header.Access-Control-Allow-Methods" = "'POST'"
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST, OPTIONS'"
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
   }
 
