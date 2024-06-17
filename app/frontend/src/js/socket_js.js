@@ -14,6 +14,7 @@ function connectToSocket(gameId, opponentUsername) {
         stompClient.subscribe("/topic/game-progress/" + gameId, function (response) {
             let data = JSON.parse(response.body);
             console.log(data);
+            displayResponse(data);
             if (data.player2 && data.player2.login) {
                 fetchProfilePics(data.player1.login, data.player2.login);
             }
@@ -175,3 +176,60 @@ function addFooter(player1PicBase64, player2PicBase64, player1Name, player2Name)
     }
     document.getElementById('game-interface').appendChild(footer);
 }
+
+function displayResponse(data) {
+    // Clear the board
+    const cells = document.querySelectorAll('.tic');
+    cells.forEach(cell => cell.textContent = '');
+
+    // Update the board state based on data
+    data.board.forEach((row, rowIndex) => {
+        row.forEach((cell, colIndex) => {
+            const cellElement = document.getElementById(`${rowIndex}_${colIndex}`);
+            cellElement.textContent = cell;
+        });
+    });
+
+    // Check if there's a winner and display the message
+    if (data.winner) {
+        document.getElementById('message').textContent = `Player ${data.winner} wins!`;
+    } else {
+        document.getElementById('message').textContent = `It's ${data.currentPlayer}'s turn`;
+    }
+}
+
+// Example of updating board state and handling clicks
+document.querySelectorAll('.tic').forEach(cell => {
+    cell.addEventListener('click', function () {
+        const idToken = localStorage.getItem('idToken');
+        const [row, col] = this.id.split('_').map(Number);
+        const payload = {
+            gameId: gameId,
+            player: {
+                login: document.getElementById('player-username').textContent
+            },
+            move: {
+                row: row,
+                col: col
+            }
+        };
+
+        fetch(`${url}/gameplay`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${idToken}`
+            },
+            body: JSON.stringify(payload)
+        }).then(response => response.json())
+          .then(data => {
+              if (data.error) {
+                  alert(data.error);
+              } else {
+                  displayResponse(data);
+              }
+          }).catch(error => {
+              console.error('Error making move:', error);
+          });
+    });
+});
