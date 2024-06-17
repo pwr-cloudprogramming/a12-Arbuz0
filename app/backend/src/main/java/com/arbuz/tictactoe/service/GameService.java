@@ -2,11 +2,8 @@ package com.arbuz.tictactoe.service;
 
 import com.arbuz.tictactoe.exception.InvalidGameException;
 import com.arbuz.tictactoe.exception.NotFoundException;
-import com.arbuz.tictactoe.model.GamePlay;
+import com.arbuz.tictactoe.model.*;
 import com.arbuz.tictactoe.exception.InvalidParamException;
-import com.arbuz.tictactoe.model.Game;
-import com.arbuz.tictactoe.model.Player;
-import com.arbuz.tictactoe.model.TicToe;
 import com.arbuz.tictactoe.storage.GameStorage;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -83,8 +80,10 @@ public class GameService {
 
         if (xWinner) {
             game.setWinner(TicToe.X);
+            game.setStatus(FINISHED);
         } else if (oWinner) {
             game.setWinner(TicToe.O);
+            game.setStatus(FINISHED);
         }
 
         GameStorage.getInstance().setGame(game);
