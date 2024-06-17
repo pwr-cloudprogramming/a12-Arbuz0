@@ -59,6 +59,15 @@ function displayResponse(data) {
 
 function updateRankings(winner, player1, player2) {
     const idToken = localStorage.getItem('idToken');
+    let result;
+    if (winner === 'X') {
+        result = 1;
+    } else if (winner === 'O') {
+        result = 2;
+    } else {
+        result = 0;
+    }
+
     $.ajax({
         url: apiGatewayUrl + "/results",
         type: 'POST',
@@ -71,7 +80,7 @@ function updateRankings(winner, player1, player2) {
             "gameId": gameId,
             "player1": player1,
             "player2": player2,
-            "winner": winner
+            "winner": result
         }),
         success: function (data) {
             console.log("Rankings updated successfully");
