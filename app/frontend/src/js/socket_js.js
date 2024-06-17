@@ -186,15 +186,15 @@ function displayResponse(data) {
     data.board.forEach((row, rowIndex) => {
         row.forEach((cell, colIndex) => {
             const cellElement = document.getElementById(`${rowIndex}_${colIndex}`);
-            cellElement.textContent = cell;
+            cellElement.textContent = cell === 1 ? 'X' : cell === 2 ? 'O' : '';
         });
     });
 
     // Check if there's a winner and display the message
     if (data.winner) {
-        document.getElementById('message').textContent = `Player ${data.winner} wins!`;
+        document.getElementById('message').textContent = `Player ${data.winner === 1 ? 'X' : 'O'} wins!`;
     } else {
-        document.getElementById('message').textContent = `It's ${data.currentPlayer}'s turn`;
+        document.getElementById('message').textContent = `It's ${data.currentPlayer === 1 ? 'X' : 'O'}'s turn`;
     }
 }
 
