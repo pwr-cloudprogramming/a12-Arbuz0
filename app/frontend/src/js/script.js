@@ -1,3 +1,5 @@
+import { apiGatewayUrl, gameId } from './config.js';
+
 var turns = [["#", "#", "#"], ["#", "#", "#"], ["#", "#", "#"]];
 var turn = "";
 var gameOn = false;
@@ -52,8 +54,34 @@ function displayResponse(data) {
     }
     if (data.winner != null) {
         alert("Winner is " + data.winner);
+        updateRankings(data.winner, data.player1.login, data.player2.login);
     }
     gameOn = true;
+}
+
+function updateRankings(winner, player1, player2) {
+    const idToken = localStorage.getItem('idToken');
+    $.ajax({
+        url: apiGatewayUrl + "/results",
+        type: 'POST',
+        headers: {
+            'Authorization': `Bearer ${idToken}`
+        },
+        dataType: "json",
+        contentType: "application/json",
+        data: JSON.stringify({
+            "gameId": gameId,
+            "player1": player1,
+            "player2": player2,
+            "winner": winner
+        }),
+        success: function (data) {
+            console.log("Rankings updated successfully");
+        },
+        error: function (error) {
+            console.log("Error updating rankings: ", error);
+        }
+    });
 }
 
 $(".tic").click(function () {
